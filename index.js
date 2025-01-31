@@ -4,10 +4,14 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const { errorMiddleware } = require("./utils/errorHandler.js");
+const compression = require("compression");
+const rateLimiter = require("./middleware/rateLimiter.js");
 
 const userRoutes = require("./routes/userRoutes.js");
 const taskRoutes = require("./routes/taskRoutes.js");
 const analyticsRoutes = require("./routes/analyticsRoutes.js");
+const authRoutes = require("./routes/authRoutes.js");
+require("./services/schedulerService.js");
 
 const app = express();
 
@@ -15,11 +19,16 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
+app.use(rateLimiter); // Apply to all routes
+
 //Routes
 app.use("/api/users", userRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/analytics", analyticsRoutes);
+app.use("/api/2fa", authRoutes);
 
+// Middleware for compression (applied after all routes)
+app.use(compression()); // Apply Gzip compression, Compress finalized responses
 app.use(errorMiddleware);
 
 //Database connection
