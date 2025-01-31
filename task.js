@@ -10,6 +10,10 @@ const TaskSchema = new mongoose.Schema({
   },
   assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  dueDate: { type: Date }
 });
+
+TaskSchema.index({ status: 1 });
+TaskSchema.index({ createdBy: 1, assignedTo: 1 });
 
 module.exports = mongoose.model("Task", TaskSchema);
